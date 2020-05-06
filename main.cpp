@@ -6,8 +6,12 @@
 #include <iostream>
 #include <fstream>
 
+#include "hashFunction.h"
+
 
 using namespace std;
+
+
 
 /*function... might want it in some class?*/
 int getdir(string dir, vector<string> &files) {
@@ -36,6 +40,13 @@ void printChunk(vector<string> chunk) {
 
 int main() {
 
+    hashNode hashTable[TABLE_LENGTH];
+
+    for(int i=0; i<TABLE_LENGTH;i++){
+       hashTable[i].sourceFile=EMPTY;
+       hashTable[i].next=NULL;
+    }
+
     vector<string> files = vector<string>();
 
     ifstream inFile;
@@ -51,9 +62,10 @@ int main() {
 
     string fileName;
     string s;
+    int hashValue=0;
 
 
-    for (unsigned int i = 2; i < files.size(); i++) {
+    for ( int i = 2; i < files.size(); i++) {
         cout << i << files[i] << endl;
 
         fileName = dir + "/" + files[i];
@@ -70,12 +82,18 @@ int main() {
         }
 
 
-        if (i == 2) {
+        if (i == 2) {//limit for test purposes
             while (inFile) {
-                // printChunk(chunk);
-                chunk.erase(chunk.begin());
+                printChunk(chunk);//debug
+
+                //hash chunk then put hash into table
+                hashValue=hashString(chunk);
+               
+
+                chunk.erase(chunk.begin()); //Cycle chunk
                 inFile >> word;
                 chunk.push_back(word);
+
 
 
             }
