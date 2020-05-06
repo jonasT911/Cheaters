@@ -4,11 +4,79 @@
 
 #include "hashFunction.h"
 
+int letterNumber(char letter) {
+    int number = letter;
 
-int hashString(vector<string> chunk){
+    if (number >= 97) {
+        number -= 32;
+    }
+    if (number >= 65 && number <= 90) {
+        number -= 65;
+    } else {
+        if (number >= 48 && number <= 57) {
+            number -= 20;
+        } else {
+            number = 0;
+        }
+    }
 
-    return 0;
+    return number;
 }
 
-void placeInTable(){
+int hashString(vector<string> chunk) {
+
+    int shifter = 1;
+    int result = 0;
+    int letter = 0;
+
+    for (int i = 0; i < chunk.size(); i++) {
+        for (int j = 0; j < chunk[i].length(); j++) {
+            letter = letterNumber(chunk[i].at(j));
+            result = result + letter * shifter;
+            shifter += 2;
+        }
+
+        shifter *= i * 3;
+    }
+
+    result = result % TABLE_LENGTH;
+
+    return result;
+}
+
+
+void putLinkedList(hashNode *node, int sourceFile) {
+
+    if (node->sourceFile != sourceFile) {
+        if (node->next == nullptr) {
+            hashNode *insert = new hashNode;
+
+            node->next = insert;
+            insert->next = nullptr;
+            insert->sourceFile = sourceFile;
+        } else {
+            putLinkedList(node->next, sourceFile);
+        }
+
+    }
+}
+
+void matchingChunks(int *result[], hashNode *node) {
+
+    hashNode *lead = node;
+    hashNode *trail = node;
+    while (lead->next) {
+        while (trail != lead) {
+
+            if (trail->sourceFile < lead->sourceFile) {//smallest value goes in front
+                result[trail->sourceFile][lead->sourceFile]++;
+            } else {
+                result[lead->sourceFile][trail->sourceFile]++;
+            }
+
+            trail = trail->next;
+        }
+        trail = node;
+        lead = lead->next;
+    }
 }

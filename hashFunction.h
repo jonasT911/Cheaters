@@ -21,6 +21,7 @@ struct hashNode {
 };
 
 int hashString(vector<string> chunk);
-void placeInTable();
+void putLinkedList(hashNode *node, int sourceFile);
+void matchingChunks(int *result[],hashNode *node);
 
 #endif //CHEATERS_HASHFUNCTION_H
