@@ -20,8 +20,15 @@ struct hashNode {
     hashNode *next;
 };
 
+
+struct matchList {
+    int collisions;
+    string report;
+};
+
 int hashString(vector<string> chunk);
-void putLinkedList(hashNode *node, int sourceFile);
+void putLinkedList(hashNode *node, int sourceFile,int &ifc);
 void matchingChunks(int *result[],hashNode *node);
+void orderedInsert(vector<matchList> &list,matchList newNode);
 
 #endif //CHEATERS_HASHFUNCTION_H

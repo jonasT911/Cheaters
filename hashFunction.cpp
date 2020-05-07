@@ -45,7 +45,7 @@ int hashString(vector<string> chunk) {
 }
 
 
-void putLinkedList(hashNode *node, int sourceFile) {
+void putLinkedList(hashNode *node, int sourceFile,int &ifc) {
 
     if (node->sourceFile != sourceFile) {
         if (node->next == nullptr) {
@@ -55,10 +55,14 @@ void putLinkedList(hashNode *node, int sourceFile) {
             insert->next = nullptr;
             insert->sourceFile = sourceFile;
         } else {
-            putLinkedList(node->next, sourceFile);
+            putLinkedList(node->next, sourceFile,ifc);
         }
 
+    }else{
+       ifc++;
+      // cout<<"KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK"<<endl;
     }
+
 }
 
 void matchingChunks(int *result[], hashNode *node) {
@@ -78,5 +82,19 @@ void matchingChunks(int *result[], hashNode *node) {
         }
         trail = node;
         lead = lead->next;
+    }
+}
+
+void orderedInsert(vector<matchList> &list,matchList newNode){
+
+    int iterator=0;
+    if(list.empty()){
+        list.push_back(newNode);
+    }else{
+        while(iterator<list.size() && (newNode.collisions<list[iterator].collisions)){
+
+            iterator++;
+        }
+        list.insert(list.begin()+iterator,newNode);
     }
 }

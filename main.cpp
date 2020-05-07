@@ -37,7 +37,7 @@ void printChunk(vector<string> chunk) {
 }
 
 
-int main() {
+int main(int argc, char *argv[]) {
 
     int ifc = 0;
     int tot = 0;
@@ -57,9 +57,9 @@ int main() {
 
     vector<string> chunk = vector<string>();
 
-    int numChunk = 6;
-    int numMatches = 200;
-    string dir = string("sm_doc_set");
+    int numChunk = stoi(argv[2]);// 6;
+    int numMatches = stoi(argv[3]);//200;
+    string dir = argv[1];//string("med_doc_set");
     //files will be taken from the command line
     //numcheck will be taken from the command line
 
@@ -71,11 +71,11 @@ int main() {
 
 
     for (int i = 2; i < files.size(); i++) {
-        cout << i << files[i] << endl;
+        //   cout << i << files[i] << endl;
 
         fileName = dir + "/" + files[i];
 
-        cout << "opening " << fileName << endl;
+        // cout << "opening " << fileName << endl;
         //Run file parsing
         inFile.open(fileName);
 
@@ -103,7 +103,11 @@ int main() {
                 hashTable[hashValue].sourceFile = i;
             } else {
                 if (hashTable[hashValue].sourceFile != i) {
-                    putLinkedList(&hashTable[hashValue], i);
+                    if (i == 22) {
+                        // cout<<" collision with "<<files[hashTable[hashValue].sourceFile];
+                        //debug  printChunk(chunk);
+                    }
+                    putLinkedList(&hashTable[hashValue], i, ifc);
 
                 } else {
                     // cout << "in file collision------------------------------------------" << hashValue << endl;//debug
@@ -126,8 +130,14 @@ int main() {
             chunk.pop_back();//clears chunk
         }
         inFile.close();
-    }
 
+        //debug
+        // cout << "There were " << ifc << " in file collisions" << endl;
+        //  cout << "out of " << tot << " hash calls" << endl;
+
+        ifc = 0;
+        tot = 0;
+    }
 
 
     int collisions[files.size()][files.size()];
@@ -148,8 +158,9 @@ int main() {
 
             hashNode *lead = &hashTable[i];
             hashNode *trail = &hashTable[i];
+            hashNode *deleter = &hashTable[i];
             //THing
-            while (lead!= nullptr) {
+            while (lead != nullptr) {
                 while (trail != lead) {
 
                     //debug cout<<trail->sourceFile <<","<<lead->sourceFile<<endl;
@@ -160,7 +171,14 @@ int main() {
                         collisions[lead->sourceFile][trail->sourceFile]++;
                     }
 
-                    trail = trail->next;
+                    if (lead->next == nullptr) {
+                        deleter = trail;
+                        trail = trail->next;
+                        delete deleter;
+                    } else {
+                        trail = trail->next;
+                    }
+
                 }
                 trail = &hashTable[i];
                 lead = lead->next;
@@ -169,32 +187,29 @@ int main() {
         }
     }
 
-    //debug
-    cout << collisions[2][2] << "= test same" << endl;
-    cout << collisions[2][3] << "= test a b" << endl;
-    cout << collisions[8][26] << "= test catch me and " << files[26] << endl;
+
 
     //create vector of files with collisions over X
-    vector<string> plagiarized;
-    string report;
+    vector<matchList> plagiarized;
+    matchList node;
     for (int i = 2; i < files.size(); i++) {
         for (int j = 2; j <= i; j++) {
             if (collisions[j][i] > numMatches) {
 
-                report = to_string(collisions[j][i]) + " " + files[j] + " and " + files[i];
-                plagiarized.push_back(report);
+                node.collisions = collisions[j][i];
+                node.report = to_string(collisions[j][i]) + ": " + files[j] + ", " + files[i];
+                //plagiarized.push_back(report);
+                orderedInsert(plagiarized, node);
             }
 
         }
     }
     //print files with over set collisions in descending order
-    cout << "Printing matches" << endl;
+    // cout << "Printing matches" << endl;
     for (int i = 0; i < plagiarized.size(); i++) {
-        cout << plagiarized[i] << endl;
+        cout << plagiarized[i].report << endl;
     }
 
-    cout << "There were " << ifc << " in file collisions" << endl;
-    cout << "out of " << tot << " hash calls" << endl;
 
     return 0;
 }
